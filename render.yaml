@@ -1,17 +1,9 @@
 services:
   - type: web
     name: form-automation-api
-    runtime: python
+    runtime: docker
+    dockerfilePath: ./Dockerfile
     plan: starter
-    buildCommand: >
-      apt-get update &&
-      apt-get install -y wget gnupg &&
-      wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - &&
-      sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' &&
-      apt-get update &&
-      apt-get install -y google-chrome-stable &&
-      pip install -r requirements.txt
-    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: API_KEY
         generateValue: true
@@ -19,5 +11,3 @@ services:
         sync: false
       - key: CREFAZON_SENHA
         sync: false
-      - key: PYTHON_VERSION
-        value: "3.11.9"

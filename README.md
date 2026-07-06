@@ -20,10 +20,26 @@ Isso evita timeout HTTP em automações que demoram alguns segundos.
 
 ## Rodando localmente
 
+Requer Google Chrome instalado na máquina (o `webdriver-manager` baixa o chromedriver compatível automaticamente).
+
 ```bash
 pip install -r requirements.txt
-playwright install chromium
+export CREFAZON_LOGIN="seu_login"
+export CREFAZON_SENHA="sua_senha"
+export API_KEY="chave-de-teste"
 uvicorn main:app --reload
+```
+
+Ou, para testar já no ambiente idêntico ao de produção (com Docker):
+
+```bash
+docker build -t form-automation-api .
+docker run -p 8000:8000 \
+  -e CREFAZON_LOGIN="seu_login" \
+  -e CREFAZON_SENHA="sua_senha" \
+  -e API_KEY="chave-de-teste" \
+  -e PORT=8000 \
+  form-automation-api
 ```
 
 Acesse `http://localhost:8000/docs` para o Swagger interativo.
@@ -42,31 +58,24 @@ O código **não contém mais nenhuma credencial**. Antes de rodar, configure:
 
 Nunca commite um arquivo `.env` com valores reais no git. Use um `.gitignore` com `.env` incluído.
 
-## Deploy no Render
+## Deploy no Render (via Docker)
 
-Selenium precisa do **Google Chrome instalado no servidor** (diferente do Playwright, que baixa o navegador sozinho). O `render.yaml` já inclui isso no build command.
+O ambiente nativo do Render (Python/Poetry) **não permite `apt-get install`** durante o build — o filesystem é somente leitura fora de um container. Por isso o Selenium precisa ser empacotado com **Docker**, que já vem pronto no projeto (`Dockerfile`).
 
 ### Opção A — Blueprint automático (recomendado)
-1. Suba esta pasta para um repositório no GitHub (sem incluir nenhum `.env`)
-2. No Render, clique em **New > Blueprint**
-3. Aponte para o repositório — o Render lê o `render.yaml` e configura a estrutura
-4. Preencha manualmente `CREFAZON_LOGIN` e `CREFAZON_SENHA` no painel (ficam como `sync: false` — o Render não define isso sozinho, por segurança)
+1. Suba esta pasta para o repositório no GitHub (incluindo o `Dockerfile`)
+2. No Render, **New > Blueprint**
+3. Aponte para o repositório — o `render.yaml` já está configurado com `runtime: docker`
+4. Preencha manualmente `CREFAZON_LOGIN` e `CREFAZON_SENHA` no painel de Environment
 5. A `API_KEY` é gerada automaticamente
 
 ### Opção B — Manual
 1. **New > Web Service** apontando pro repositório
-2. **Build Command:**
-   ```
-   apt-get update && apt-get install -y wget gnupg && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' && apt-get update && apt-get install -y google-chrome-stable && pip install -r requirements.txt
-   ```
-3. **Start Command:**
-   ```
-   uvicorn main:app --host 0.0.0.0 --port $PORT
-   ```
-4. Em **Environment**, adicione `API_KEY`, `CREFAZON_LOGIN` e `CREFAZON_SENHA`
-5. Plano: use pelo menos o **Starter** — o Chrome + Selenium consome bastante RAM, o plano Free tende a travar ou hibernar no meio da automação
+2. Em **Language/Runtime**, selecione **Docker** (não Python) — o Render detecta o `Dockerfile` automaticamente
+3. Em **Environment**, adicione `API_KEY`, `CREFAZON_LOGIN` e `CREFAZON_SENHA`
+4. Plano: use pelo menos o **Starter** — Chrome + Selenium consome bastante RAM, o plano Free tende a travar ou hibernar no meio da automação
 
-**Se o `apt-get` falhar no ambiente nativo do Render** (algumas contas restringem isso), a alternativa é fazer deploy via **Docker** — nesse caso me avise que monto um `Dockerfile` com Chrome + Chromedriver pré-instalados, que é mais garantido de funcionar.
+⚠️ **Importante:** ao criar o serviço, garanta que o Render está configurado como **Docker**, não Python. Se ele detectar `requirements.txt` e tentar rodar como ambiente Python nativo, vai cair no mesmo erro de `apt-get` que você já viu.
 
 ## Chamando a API (exemplo)
 
