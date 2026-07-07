@@ -52,7 +52,7 @@ def _validar_credenciais():
 
 
 def _validar_dados_obrigatorios(dados: dict):
-    obrigatorios = ["cpf", "nome", "data_nascimento", "telefone", "cep"]
+    obrigatorios = ["cpf", "nome", "data_nascimento", "telefone", "cep", "cod_instalacao, data_leitura"]
     faltando = [campo for campo in obrigatorios if not dados.get(campo)]
     if faltando:
         raise ValueError(f"Campos obrigatórios ausentes: {', '.join(faltando)}")
@@ -71,7 +71,9 @@ def preencher_formulario(dados: dict) -> dict:
                 "telefone": "17996795804",
                 "cep": "15501096",
                 "ocupacao": "Assalariado",     # opcional, default "Assalariado"
-                "possui_veiculo": True          # opcional, default True
+                "possui_veiculo": True,          # opcional, default True
+                "cod_instalacao": "24748333820",
+                "data_leitura": "14/12/1974"
             }
 
     Returns:
@@ -186,6 +188,41 @@ def preencher_formulario(dados: dict) -> dict:
         # ---------- SIMULAR ----------
         botao_simular = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[normalize-space()='SIMULAR']")))
         botao_simular.click()
+        time.sleep(3)
+
+        # ---------- DADOS INSTALAÇÂO ----------
+        campo_instalacao = wait.until(EC.visibility_of_element_located((By.NAME, "adicionais.0.valor")))
+        campo_instalacao.send_keys(dados["cod_instalacao"])
+
+        campo_data_leitura = wait.until(
+            EC.visibility_of_element_located((By.XPATH, "//input[@placeholder='Selecionar data']"))
+        )
+        campo_data_leitura.send_keys(dados["data_leitura"])
+        ActionChains(driver).move_to_element(body).click().perform()
+        time.sleep(2)
+
+        botao_consultar = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Consultar valores']")))
+        botao_consultar.click()
+        time.sleep(3)
+
+        campo_valor = driver.find_element(By.XPATH, "//input[@id='rc_select_10']")
+        campo_valor.send_keys(Keys.ENTER)
+
+        botao_calcular = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='CALCULAR']")))
+        botao_calcular.click()
+        time.sleep(3)
+
+        botao_prazo = wait.until(EC.element_to_be_clickable((By.XPATH, f"//span[normalize-space()='{texto_veiculo}']")))
+        botao_prazo.click()
+
+        botao_prazo = driver.find_element(By.XPATH, "//label[contains(@class, 'ofertas-produtos-radio-button-1')]")
+        radio = label.find_element(By.XPATH, ".//input[@type='radio']")
+
+        # Ant Design geralmente esconde o input real e usa o label pra clique visual
+        botao_prazo.click()  # clica no label (mais confiável com Ant Design)
+
+        botao_cadastrar = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='CADASTRAR']")))
+        botao_cadastrar.click()
         time.sleep(3)
 
 
