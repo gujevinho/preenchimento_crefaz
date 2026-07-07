@@ -186,7 +186,7 @@ def preencher_formulario(dados: dict) -> dict:
         # ---------- SIMULAR ----------
         botao_simular = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[normalize-space()='SIMULAR']")))
         botao_simular.click()
-        time.sleep(02)
+        time.sleep(2)
 
 
         logger.info("Automação concluída com sucesso")
