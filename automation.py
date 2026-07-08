@@ -21,6 +21,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.keys import Keys
 
 logger = logging.getLogger("automation")
 
@@ -205,10 +206,17 @@ def preencher_formulario(dados: dict) -> dict:
 
         botao_consultar = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Consultar valores']")))
         botao_consultar.click()
-        time.sleep(3)
+        time.sleep(10)
 
-        campo_valor = driver.find_element(By.XPATH, "//input[@id='rc_select_10']")
-        campo_valor.send_keys(Keys.ENTER)
+         ActionChains(driver).move_to_element(body).click().perform()
+        time.sleep(2)
+        ActionChains(driver).send_keys(Keys.TAB).perform()
+        ActionChains(driver).send_keys(Keys.ENTER).perform()
+        select_input = driver.find_element(By.ID, "rc_select_5")
+        select_input.click()
+        select_input.send_keys(Keys.ENTER)
+
+        time.sleep(3)
 
         botao_calcular = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='CALCULAR']")))
         botao_calcular.click()
@@ -217,11 +225,8 @@ def preencher_formulario(dados: dict) -> dict:
         botao_prazo = wait.until(EC.element_to_be_clickable((By.XPATH, f"//span[normalize-space()='{texto_veiculo}']")))
         botao_prazo.click()
 
-        botao_prazo = driver.find_element(By.XPATH, "//label[contains(@class, 'ofertas-produtos-radio-button-1')]")
-        radio = label.find_element(By.XPATH, ".//input[@type='radio']")
-
-        # Ant Design geralmente esconde o input real e usa o label pra clique visual
-        botao_prazo.click()  # clica no label (mais confiável com Ant Design)
+        radio_input = driver.find_element(By.XPATH, "//input[@type='radio' and @class='ant-radio-input']")
+        driver.execute_script("arguments[0].click();", radio_input)
 
         botao_cadastrar = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='CADASTRAR']")))
         botao_cadastrar.click()
