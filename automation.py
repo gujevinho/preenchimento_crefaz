@@ -193,6 +193,7 @@ def preencher_formulario(dados: dict) -> dict:
         # ---------- DADOS INSTALAÇÂO ----------
         campo_instalacao = wait.until(EC.visibility_of_element_located((By.NAME, "adicionais.0.valor")))
         campo_instalacao.click()
+        #inserido click para liberar o campo
         campo_instalacao.send_keys(dados["cod_instalacao"])
 
         campo_data_leitura = wait.until(
