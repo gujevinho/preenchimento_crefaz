@@ -208,7 +208,7 @@ def preencher_formulario(dados: dict) -> dict:
         botao_consultar.click()
         time.sleep(10)
 
-         ActionChains(driver).move_to_element(body).click().perform()
+        ActionChains(driver).move_to_element(body).click().perform()
         time.sleep(2)
         ActionChains(driver).send_keys(Keys.TAB).perform()
         ActionChains(driver).send_keys(Keys.ENTER).perform()
