@@ -117,7 +117,7 @@ def preencher_formulario(dados: dict) -> dict:
         # ---------- NAVEGAÇÃO ATÉ NOVA PROPOSTA ----------
         botao_credito = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[normalize-space()='Crédito']")))
         botao_credito.click()
-        time.sleep(3)
+        time.sleep(2)
 
         botao_proposta = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[normalize-space()='Proposta']")))
         botao_proposta.click()
@@ -133,7 +133,7 @@ def preencher_formulario(dados: dict) -> dict:
         campo_cpf = wait.until(EC.visibility_of_element_located((By.NAME, "cpf")))
         campo_cpf.send_keys(dados["cpf"])
         ActionChains(driver).move_to_element(body).click().perform()
-        time.sleep(2)
+        time.sleep(1)
 
         campo_nome = wait.until(EC.visibility_of_element_located((By.NAME, "nome")))
         campo_nome.send_keys(dados["nome"])
@@ -143,7 +143,7 @@ def preencher_formulario(dados: dict) -> dict:
         )
         campo_data_nasc.send_keys(dados["data_nascimento"])
         ActionChains(driver).move_to_element(body).click().perform()
-        time.sleep(2)
+        time.sleep(1)
 
         campo_telefone = wait.until(EC.visibility_of_element_located((By.NAME, "telefone")))
         campo_telefone.send_keys(dados["telefone"])
@@ -168,7 +168,7 @@ def preencher_formulario(dados: dict) -> dict:
             )
         )
         opcao_ocupacao.click()
-        time.sleep(2)
+        
 
         # ---------- CEP ----------
         campo_cep = wait.until(EC.visibility_of_element_located((By.NAME, "cep")))
@@ -202,11 +202,11 @@ def preencher_formulario(dados: dict) -> dict:
         )
         campo_data_leitura.send_keys(dados["data_leitura"])
         ActionChains(driver).move_to_element(body).click().perform()
-        time.sleep(2)
+        time.sleep(1)
 
         botao_consultar = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Consultar valores']")))
         botao_consultar.click()
-        time.sleep(10)
+        time.sleep(5)
 
         ActionChains(driver).move_to_element(body).click().perform()
         time.sleep(2)
@@ -222,8 +222,7 @@ def preencher_formulario(dados: dict) -> dict:
         botao_calcular.click()
         time.sleep(3)
 
-        botao_prazo = wait.until(EC.element_to_be_clickable((By.XPATH, f"//span[normalize-space()='{texto_veiculo}']")))
-        botao_prazo.click()
+
 
         radio_input = driver.find_element(By.XPATH, "//input[@type='radio' and @class='ant-radio-input']")
         driver.execute_script("arguments[0].click();", radio_input)
