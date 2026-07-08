@@ -89,7 +89,7 @@ def preencher_formulario(dados: dict) -> dict:
     logger.info(f"Iniciando automação para CPF {dados['cpf'][:3]}***")
 
     driver = _criar_driver()
-    wait = WebDriverWait(driver, 15)
+    wait = WebDriverWait(driver, 10)
 
     try:
         # ---------- LOGIN ----------
@@ -162,8 +162,7 @@ def preencher_formulario(dados: dict) -> dict:
         input_busca.send_keys(ocupacao)
         time.sleep(1)
 
-        opcao_ocupacao = wait.until(
-            EC.element_to_be_clickable(
+        opcao_ocupacao = wait.until(EC.element_to_be_clickable(
                 (By.XPATH, f"//div[contains(@class,'ant-select-item-option') and contains(@title,'{ocupacao}')]")
             )
         )
