@@ -87,3 +87,59 @@ def status_job(job_id: str, x_api_key: Optional[str] = Header(None)):
     if not job:
         raise HTTPException(status_code=404, detail="Job não encontrado")
     return {"job_id": job_id, **job}
+    
+    # ----------------------------------------------------------------------
+# Consultas de Histórico de Automações
+# ----------------------------------------------------------------------
+
+@app.get("/jobs")
+def listar_todos_jobs(x_api_key: Optional[str] = Header(None)):
+    """Lista todas as automações executadas (histórico completo)."""
+    verificar_api_key(x_api_key)
+    
+    lista_jobs = []
+    for job_id, dados in jobs.items():
+        # Adiciona o job_id dentro do dicionário de dados para facilitar a leitura
+        lista_jobs.append({"job_id": job_id, **dados})
+        
+    # Ordena do mais recente para o mais antigo (baseado no criado_em)
+    lista_jobs.sort(key=lambda x: x.get("criado_em", ""), reverse=True)
+    
+    return {
+        "total": len(lista_jobs),
+        "jobs": lista_jobs
+    }
+
+@app.get("/jobs/falhas")
+def listar_jobs_com_falha(x_api_key: Optional[str] = Header(None)):
+    """Lista apenas as automações que falharam (status 'erro')."""
+    verificar_api_key(x_api_key)
+    
+    lista_falhas = []
+    for job_id, dados in jobs.items():
+        if dados.get("status") == "erro":
+            lista_falhas.append({"job_id": job_id, **dados})
+            
+    lista_falhas.sort(key=lambda x: x.get("criado_em", ""), reverse=True)
+    
+    return {
+        "total": len(lista_falhas),
+        "jobs": lista_falhas
+    }
+
+@app.get("/jobs/concluidos")
+def listar_jobs_concluidos(x_api_key: Optional[str] = Header(None)):
+    """Lista apenas as automações que tiveram sucesso (status 'concluido')."""
+    verificar_api_key(x_api_key)
+    
+    lista_sucessos = []
+    for job_id, dados in jobs.items():
+        if dados.get("status") == "concluido":
+            lista_sucessos.append({"job_id": job_id, **dados})
+            
+    lista_sucessos.sort(key=lambda x: x.get("criado_em", ""), reverse=True)
+    
+    return {
+        "total": len(lista_sucessos),
+        "jobs": lista_sucessos
+    }
